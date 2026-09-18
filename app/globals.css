@@ -1,26 +1,63 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Brand palette — deep forest greens on warm cream, with a muted gold accent. */
+@theme {
+  --color-forest-950: #06130d;
+  --color-forest-900: #0b2118;
+  --color-forest-800: #12321f;
+  --color-forest-700: #1b4630;
+  --color-forest-600: #275d41;
+  --color-moss-500: #4d7c5b;
+  --color-moss-400: #6f9a7c;
+  --color-sage-300: #a9c2a8;
+  --color-sage-200: #cddbc9;
+  --color-sage-100: #e6ede2;
+  --color-cream-50: #f8f6f0;
+  --color-cream-100: #f1ede2;
+  --color-cream-200: #e4ddcb;
+  --color-gold-400: #c9a962;
+  --color-gold-500: #b3924a;
+
+  --font-display: var(--font-display), "Georgia", serif;
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--color-cream-50);
+    color: var(--color-forest-900);
+    font-family: var(--font-sans);
+  }
+  ::selection {
+    background: var(--color-sage-200);
+    color: var(--color-forest-900);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Small-caps label used above section headings */
+  .eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  /* Long-form article body (journal stories) */
+  .prose-story p {
+    margin-bottom: 1.5rem;
+    line-height: 1.85;
+  }
+  .prose-story p:first-of-type::first-letter {
+    font-family: var(--font-display);
+    font-size: 3.6rem;
+    line-height: 0.8;
+    float: left;
+    padding-right: 0.6rem;
+    padding-top: 0.35rem;
+    color: var(--color-forest-700);
+  }
 }

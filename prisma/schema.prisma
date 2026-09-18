@@ -1,0 +1,120 @@
+// Prisma schema — https://pris.ly/d/prisma-schema
+// Database URL is configured in prisma.config.ts (reads DATABASE_URL from .env)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// CMS admin — there is no signup; the only admin is created by `prisma/seed.ts`.
+model Admin {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+}
+
+// Server-side login sessions; the token is stored in an httpOnly cookie.
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  adminId   String
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+}
+
+// ---------- Site content (managed in /admin) ----------
+
+model SiteSettings {
+  id           Int      @id @default(1)
+  siteName     String
+  tagline      String
+  heroTitle    String
+  heroSubtitle String
+  heroImage    String
+  aboutTitle   String
+  aboutBody    String
+  aboutImage   String
+  email        String
+  phone        String
+  address      String
+  instagram    String?
+  updatedAt    DateTime @updatedAt
+}
+
+model Destination {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  region      String
+  tagline     String
+  description String
+  heroImage   String
+  gallery     String[]  @default([])
+  highlights  String[]  @default([])
+  duration    String
+  difficulty  String
+  bestSeason  String
+  priceFrom   Int?
+  featured    Boolean   @default(false)
+  published   Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  enquiries   Enquiry[]
+}
+
+model Story {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  body        String
+  coverImage  String
+  author      String
+  readMinutes Int      @default(5)
+  published   Boolean  @default(true)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  quote     String
+  name      String
+  detail    String
+  published Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Enquiry {
+  id            String       @id @default(cuid())
+  name          String
+  email         String
+  message       String
+  destination   Destination? @relation(fields: [destinationId], references: [id], onDelete: SetNull)
+  destinationId String?
+  read          Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+}
