@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma";
 
 export default async function AdminDashboardPage() {
   const admin = await requireAdmin();
-  const [destinations, published, stories, testimonials, unread, recent] = await Promise.all([
+  const [destinations, published, stories, guides, unread, subscribers, recent] = await Promise.all([
     prisma.destination.count(),
     prisma.destination.count({ where: { published: true } }),
     prisma.story.count({ where: { published: true } }),
-    prisma.testimonial.count({ where: { published: true } }),
+    prisma.guide.count({ where: { published: true } }),
     prisma.enquiry.count({ where: { read: false } }),
+    prisma.subscriber.count(),
     prisma.enquiry.findMany({ orderBy: { createdAt: "desc" }, take: 5, include: { destination: { select: { name: true } } } }),
   ]);
 
@@ -21,10 +22,11 @@ export default async function AdminDashboardPage() {
         <a href="/" target="_blank" rel="noreferrer" className="underline">View live site ↗</a>
       </p>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Stat label="Destinations" value={`${published} / ${destinations}`} sub="published / total" href="/admin/destinations" />
         <Stat label="Journal stories" value={stories} sub="published" href="/admin/stories" />
-        <Stat label="Testimonials" value={testimonials} sub="published" href="/admin/testimonials" />
+        <Stat label="Guides" value={guides} sub="published" href="/admin/guides" />
+        <Stat label="Subscribers" value={subscribers} sub="newsletter" href="/admin/subscribers" />
         <Stat label="Unread enquiries" value={unread} sub="awaiting reply" href="/admin/enquiries" highlight={unread > 0} />
       </div>
 

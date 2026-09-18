@@ -35,10 +35,20 @@ export default async function SettingsPage() {
             <Input name="heroImage" label="Hero image URL" type="url" required defaultValue={s.heroImage} />
           </Section>
 
+          <Section title="Home intro statement">
+            <Textarea name="introStatement" label="Statement" rows={3} defaultValue={s.introStatement} hint="Large serif statement under the hero. Reveals word by word. Leave blank to hide." />
+          </Section>
+
           <Section title="About">
             <Input name="aboutTitle" label="About headline" required defaultValue={s.aboutTitle} />
             <Textarea name="aboutBody" label="About text" rows={8} required defaultValue={s.aboutBody} hint="Separate paragraphs with a blank line." />
             <Input name="aboutImage" label="About image URL" type="url" required defaultValue={s.aboutImage} />
+          </Section>
+
+          <Section title="Impact page">
+            <Input name="impactTitle" label="Headline" defaultValue={s.impactTitle} placeholder="Travel that leaves the ground better" />
+            <Textarea name="impactBody" label="Intro text" rows={6} defaultValue={s.impactBody} hint="Separate paragraphs with a blank line." />
+            <Input name="impactImage" label="Impact image URL" type="url" defaultValue={s.impactImage} hint="Falls back to the about image." />
           </Section>
 
           <Section title="Contact">

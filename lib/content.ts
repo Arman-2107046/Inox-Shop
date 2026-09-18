@@ -17,6 +17,10 @@ const DEFAULT_SETTINGS = {
   phone: "+1 (000) 000-0000",
   address: "Somewhere green",
   instagram: null as string | null,
+  introStatement: "",
+  impactTitle: "",
+  impactBody: "",
+  impactImage: "",
   updatedAt: new Date(0),
 };
 
@@ -80,3 +84,82 @@ export function linesToArray(input: string) {
     .map((s) => s.trim())
     .filter(Boolean);
 }
+
+// ---------- Premium content ----------
+
+export type ItineraryDay = { title: string; body: string };
+
+/** Parses the Json column into a typed itinerary, tolerating bad data. */
+export function parseItinerary(raw: unknown): ItineraryDay[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((d): d is ItineraryDay => !!d && typeof d === "object" && typeof (d as ItineraryDay).title === "string")
+    .map((d) => ({ title: d.title, body: typeof d.body === "string" ? d.body : "" }));
+}
+
+/**
+ * Textarea format for itineraries in the CMS: days separated by a line
+ * containing only `---`; the first line of each block is the title.
+ */
+export function itineraryFromText(text: string): ItineraryDay[] {
+  return text
+    .split(/\r?\n-{3,}\r?\n/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => {
+      const [title, ...rest] = block.split(/\r?\n/);
+      return { title: title.trim(), body: rest.join("\n").trim() };
+    });
+}
+
+export function itineraryToText(days: ItineraryDay[]) {
+  return days.map((d) => `${d.title}\n${d.body}`).join("\n---\n");
+}
+
+export const getPublishedCategories = cache(async () =>
+  prisma.category.findMany({
+    where: { published: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    include: { _count: { select: { destinations: { where: { published: true } } } } },
+  }),
+);
+
+export const getCategoryBySlug = cache(async (slug: string) =>
+  prisma.category.findFirst({
+    where: { slug, published: true },
+    include: {
+      destinations: { where: { published: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] },
+    },
+  }),
+);
+
+export const getPublishedDestinationsWithCategories = cache(async () =>
+  prisma.destination.findMany({
+    where: { published: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+    include: { categories: { select: { slug: true, name: true } } },
+  }),
+);
+
+export const getDestinationDetail = cache(async (slug: string) =>
+  prisma.destination.findFirst({
+    where: { slug, published: true },
+    include: { categories: { select: { slug: true, name: true } } },
+  }),
+);
+
+export const getGuides = cache(async () =>
+  prisma.guide.findMany({ where: { published: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
+);
+
+export const getFaqs = cache(async () =>
+  prisma.faq.findMany({ where: { published: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
+);
+
+export const getStats = cache(async () => prisma.stat.findMany({ orderBy: { sortOrder: "asc" } }));
+
+export const getPublishedPages = cache(async () =>
+  prisma.page.findMany({ where: { published: true }, select: { slug: true, title: true }, orderBy: { title: "asc" } }),
+);
+
+export const getPageBySlug = cache(async (slug: string) => prisma.page.findFirst({ where: { slug, published: true } }));

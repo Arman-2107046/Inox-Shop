@@ -1,6 +1,8 @@
 import Image from "next/image";
-import { CtaBand, SectionHeading } from "@/components/site/cards";
-import { getSettings, getTestimonials } from "@/lib/content";
+import Link from "next/link";
+import { Counter, Parallax, Reveal, Stagger, StaggerItem } from "@/components/motion/primitives";
+import { CtaBand, PageHero, SectionHeading } from "@/components/site/cards";
+import { getGuides, getSettings, getStats } from "@/lib/content";
 
 export const metadata = { title: "About" };
 
@@ -11,71 +13,113 @@ const principles = [
   { n: "04", title: "Stay honest", body: "No greenwash. We publish what we give back and what we still get wrong." },
 ];
 
+const timeline = [
+  { year: "2016", text: "Two friends, a borrowed tent, a valley with no name on the map." },
+  { year: "2018", text: "First guided departure: eight travellers to Torres del Paine." },
+  { year: "2021", text: "Conservation contribution written into every booking." },
+  { year: "2024", text: "Partnership with the Kitasoo Xai'xais Nation in the Great Bear Rainforest." },
+  { year: "Today", text: "Small groups, local guides, and a growing list of places we'd rather keep quiet about." },
+];
+
 export default async function AboutPage() {
-  const [s, testimonials] = await Promise.all([getSettings(), getTestimonials()]);
+  const [s, guides, stats] = await Promise.all([getSettings(), getGuides(), getStats()]);
+  const paragraphs = s.aboutBody.split(/\n\s*\n/);
 
   return (
     <>
-      <section className="relative flex min-h-[70vh] items-end bg-forest-950">
-        <Image src={s.aboutImage} alt="" fill priority sizes="100vw" className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-forest-950 via-forest-950/40 to-transparent" />
-        <div className="relative mx-auto w-full max-w-7xl px-6 pb-20 pt-40 lg:px-10">
-          <p className="eyebrow text-gold-400">About {s.siteName}</p>
-          <h1 className="mt-4 max-w-3xl font-display text-5xl font-medium leading-tight text-cream-50 md:text-7xl">
-            {s.aboutTitle}
-          </h1>
-        </div>
-      </section>
+      <PageHero eyebrow={`About ${s.siteName}`} title={s.aboutTitle} image={s.aboutImage} height="min-h-[80vh]" />
 
-      <section className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-        <div className="grid gap-12 lg:grid-cols-[1fr_1.2fr]">
+      {/* Story */}
+      <section className="mx-auto max-w-[1440px] px-6 py-28 lg:px-12 lg:py-36">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-24">
           <SectionHeading eyebrow="Our story" title="Born on a footpath, not in a boardroom" />
-          <div className="prose-story text-lg text-forest-800">
-            {s.aboutBody.split(/\n\s*\n/).map((para, i) => (
-              <p key={i}>{para}</p>
-            ))}
-          </div>
+          <Reveal delay={0.2}>
+            <div className="prose-story text-lg text-forest-800">
+              {paragraphs.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </section>
 
+      {/* Timeline */}
+      <section className="border-y border-forest-900/10 bg-cream-100">
+        <div className="mx-auto max-w-[1440px] px-6 py-28 lg:px-12">
+          <Reveal>
+            <p className="eyebrow rule text-moss-500">The road so far</p>
+          </Reveal>
+          <Stagger as="ul" className="mt-12 grid gap-10 md:grid-cols-5" stagger={0.12}>
+            {timeline.map((t) => (
+              <StaggerItem key={t.year} as="li" className="border-t border-forest-900/20 pt-6">
+                <p className="font-display text-4xl font-light text-forest-900">{t.year}</p>
+                <p className="mt-3 text-sm leading-relaxed text-forest-700/80">{t.text}</p>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        </div>
+      </section>
+
+      {/* Principles */}
       <section className="bg-forest-900 text-cream-50">
-        <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
+        <div className="mx-auto max-w-[1440px] px-6 py-28 lg:px-12 lg:py-36">
           <SectionHeading eyebrow="How we travel" title="Four quiet principles" tone="light" />
-          <div className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-white/10 md:grid-cols-2">
+          <Stagger className="mt-16 grid gap-px overflow-hidden rounded-[1.25rem] bg-white/10 md:grid-cols-2" stagger={0.1}>
             {principles.map((p) => (
-              <div key={p.n} className="bg-forest-900 p-10">
-                <p className="font-display text-4xl text-gold-400">{p.n}</p>
-                <h3 className="mt-4 font-display text-3xl">{p.title}</h3>
-                <p className="mt-3 max-w-md leading-relaxed text-sage-300">{p.body}</p>
-              </div>
+              <StaggerItem key={p.n} className="group bg-forest-900 p-10 transition duration-500 hover:bg-forest-800 lg:p-14">
+                <p className="font-display text-5xl font-light text-gold-400">{p.n}</p>
+                <h3 className="mt-6 font-display text-3xl font-light md:text-4xl">{p.title}</h3>
+                <p className="mt-4 max-w-md leading-relaxed text-sage-300">{p.body}</p>
+              </StaggerItem>
             ))}
-          </div>
+          </Stagger>
         </div>
       </section>
 
-      {testimonials.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 py-24 lg:px-10">
-          <SectionHeading eyebrow="Travellers" title="In their words" align="center" />
-          <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {testimonials.map((t) => (
-              <figure key={t.id} className="rounded-2xl border border-cream-200 bg-cream-100 p-8">
-                <blockquote className="font-display text-2xl italic leading-snug text-forest-900">“{t.quote}”</blockquote>
-                <figcaption className="mt-6 text-sm">
-                  <p className="font-medium text-forest-900">{t.name}</p>
-                  <p className="text-forest-700/70">{t.detail}</p>
-                </figcaption>
-              </figure>
-            ))}
+      {/* Stats */}
+      {stats.length > 0 && (
+        <section className="mx-auto grid max-w-[1440px] grid-cols-2 gap-y-12 px-6 py-24 md:grid-cols-4 lg:px-12">
+          {stats.map((st, i) => (
+            <Reveal key={st.id} delay={i * 0.1} className="text-center md:text-left">
+              <p className="font-display text-6xl font-light text-forest-900">
+                <Counter value={st.value} suffix={st.suffix} />
+              </p>
+              <p className="mt-3 text-xs uppercase tracking-[0.2em] text-moss-500">{st.label}</p>
+            </Reveal>
+          ))}
+        </section>
+      )}
+
+      {/* Guides preview */}
+      {guides.length > 0 && (
+        <section className="bg-cream-100">
+          <div className="mx-auto max-w-[1440px] px-6 py-28 lg:px-12">
+            <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+              <SectionHeading eyebrow="The people" title="Guided by those who belong there" />
+              <Reveal delay={0.3}>
+                <Link href="/guides" className="link-draw eyebrow shrink-0 pb-1 text-forest-700">
+                  Meet all guides →
+                </Link>
+              </Reveal>
+            </div>
+            <Stagger className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" stagger={0.1}>
+              {guides.slice(0, 4).map((g) => (
+                <StaggerItem key={g.id}>
+                  <Parallax speed={0.06} className="relative aspect-[3/4] overflow-hidden rounded-[1.25rem] bg-sage-200">
+                    <div className="relative h-[112%] w-full -translate-y-[6%]">
+                      <Image src={g.image} alt={g.name} fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" />
+                    </div>
+                  </Parallax>
+                  <p className="mt-5 font-display text-2xl text-forest-900">{g.name}</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-moss-500">{g.role} · {g.location}</p>
+                </StaggerItem>
+              ))}
+            </Stagger>
           </div>
         </section>
       )}
 
-      <CtaBand
-        title="Come walk with us"
-        body="Every journey starts with a conversation about what you hope to feel, not just see."
-        href="/contact"
-        label="Get in touch"
-      />
+      <CtaBand title="Come walk with us" body="Every journey starts with a conversation about what you hope to feel, not just see." href="/contact" label="Get in touch" image={s.heroImage} />
     </>
   );
 }

@@ -1,34 +1,31 @@
-import { CtaBand, DestinationCard, SectionHeading } from "@/components/site/cards";
-import { getPublishedDestinations } from "@/lib/content";
+import { Suspense } from "react";
+import { CtaBand, PageHero } from "@/components/site/cards";
+import { DestinationGrid } from "@/components/site/destination-grid";
+import { getPublishedCategories, getPublishedDestinationsWithCategories, getSettings } from "@/lib/content";
 
 export const metadata = { title: "Destinations" };
 
 export default async function DestinationsPage() {
-  const destinations = await getPublishedDestinations();
+  const [destinations, categories, s] = await Promise.all([
+    getPublishedDestinationsWithCategories(),
+    getPublishedCategories(),
+    getSettings(),
+  ]);
 
   return (
     <>
-      <section className="bg-forest-950 pb-20 pt-40 text-cream-50">
-        <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <SectionHeading
-            eyebrow="Destinations"
-            title="Wild places, walked slowly"
-            intro="Every journey below is small-group, locally guided and built around the seasons of the landscape."
-            tone="light"
-          />
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Destinations"
+        title="Wild places, walked slowly"
+        intro="Every journey below is small-group, locally guided and built around the seasons of the landscape."
+        image={destinations[0]?.heroImage ?? s.heroImage}
+        height="min-h-[75vh]"
+      />
 
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
-        {destinations.length === 0 ? (
-          <p className="text-forest-700/70">No destinations published yet.</p>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {destinations.map((d) => (
-              <DestinationCard key={d.id} d={d} />
-            ))}
-          </div>
-        )}
+      <section className="mx-auto max-w-[1440px] px-6 py-20 lg:px-12 lg:py-28">
+        <Suspense fallback={null}>
+          <DestinationGrid items={destinations} filters={categories.map((c) => ({ slug: c.slug, name: c.name }))} />
+        </Suspense>
       </section>
 
       <CtaBand
@@ -36,6 +33,7 @@ export default async function DestinationsPage() {
         body="Most of our journeys began as a conversation. Tell us what you're looking for."
         href="/contact"
         label="Talk to us"
+        image={s.aboutImage}
       />
     </>
   );

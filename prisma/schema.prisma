@@ -45,42 +45,51 @@ model Session {
 // ---------- Site content (managed in /admin) ----------
 
 model SiteSettings {
-  id           Int      @id @default(1)
-  siteName     String
-  tagline      String
-  heroTitle    String
-  heroSubtitle String
-  heroImage    String
-  aboutTitle   String
-  aboutBody    String
-  aboutImage   String
-  email        String
-  phone        String
-  address      String
-  instagram    String?
-  updatedAt    DateTime @updatedAt
+  id             Int      @id @default(1)
+  siteName       String
+  tagline        String
+  heroTitle      String
+  heroSubtitle   String
+  heroImage      String
+  aboutTitle     String
+  aboutBody      String
+  aboutImage     String
+  email          String
+  phone          String
+  address        String
+  instagram      String?
+  introStatement String   @default("")
+  impactTitle    String   @default("")
+  impactBody     String   @default("")
+  impactImage    String   @default("")
+  updatedAt      DateTime @updatedAt
 }
 
 model Destination {
-  id          String    @id @default(cuid())
-  slug        String    @unique
+  id          String     @id @default(cuid())
+  slug        String     @unique
   name        String
   region      String
   tagline     String
   description String
   heroImage   String
-  gallery     String[]  @default([])
-  highlights  String[]  @default([])
+  gallery     String[]   @default([])
+  highlights  String[]   @default([])
   duration    String
   difficulty  String
   bestSeason  String
   priceFrom   Int?
-  featured    Boolean   @default(false)
-  published   Boolean   @default(true)
-  sortOrder   Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  featured    Boolean    @default(false)
+  published   Boolean    @default(true)
+  sortOrder   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   enquiries   Enquiry[]
+  groupSize   String     @default("Max 10")
+  itinerary   Json       @default("[]")
+  inclusions  String[]   @default([])
+  exclusions  String[]   @default([])
+  categories  Category[]
 }
 
 model Story {
@@ -117,4 +126,61 @@ model Enquiry {
   destinationId String?
   read          Boolean      @default(false)
   createdAt     DateTime     @default(now())
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  name         String
+  tagline      String
+  description  String
+  image        String
+  sortOrder    Int           @default(0)
+  published    Boolean       @default(true)
+  destinations Destination[]
+  createdAt    DateTime      @default(now())
+}
+
+model Guide {
+  id        String   @id @default(cuid())
+  name      String
+  role      String
+  location  String
+  bio       String
+  image     String
+  sortOrder Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  sortOrder Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Stat {
+  id        String @id @default(cuid())
+  value     Int
+  suffix    String @default("")
+  label     String
+  sortOrder Int    @default(0)
+}
+
+model Page {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  body      String
+  published Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }

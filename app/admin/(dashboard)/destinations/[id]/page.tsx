@@ -9,7 +9,10 @@ import { DestinationFields } from "../destination-fields";
 export default async function EditDestinationPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
   const { id } = await params;
-  const d = await prisma.destination.findUnique({ where: { id } });
+  const [d, categories] = await Promise.all([
+    prisma.destination.findUnique({ where: { id }, include: { categories: { select: { id: true } } } }),
+    prisma.category.findMany({ orderBy: { sortOrder: "asc" }, select: { id: true, name: true } }),
+  ]);
   if (!d) notFound();
 
   return (
@@ -17,7 +20,7 @@ export default async function EditDestinationPage({ params }: { params: Promise<
       <PageHeader title={`Edit: ${d.name}`} description={`/destinations/${d.slug}`} />
       <div className="mt-6">
         <EntityForm action={updateDestination.bind(null, d.id)} submitLabel="Save changes" cancelHref="/admin/destinations">
-          <DestinationFields d={d} />
+          <DestinationFields d={d} categories={categories} />
         </EntityForm>
       </div>
     </div>

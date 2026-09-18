@@ -1,5 +1,6 @@
 // Sample site content. Called from seed.ts; safe to re-run (upserts by slug).
 import type { PrismaClient } from "../app/generated/prisma/client";
+import { seedPremium } from "./seed-premium";
 
 const img = (id: string, w = 1800) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
 
@@ -236,6 +237,8 @@ export async function seedContent(prisma: PrismaClient) {
   if ((await prisma.testimonial.count()) === 0) {
     await prisma.testimonial.createMany({ data: testimonials });
   }
+
+  await seedPremium(prisma);
 
   console.log(`Content ready: ${destinations.length} destinations, ${stories.length} stories, ${testimonials.length} testimonials`);
 }

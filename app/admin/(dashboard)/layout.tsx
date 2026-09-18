@@ -8,9 +8,15 @@ export const metadata = { title: "Admin" };
 const nav = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/destinations", label: "Destinations" },
+  { href: "/admin/collections", label: "Collections" },
   { href: "/admin/stories", label: "Journal" },
+  { href: "/admin/guides", label: "Guides" },
   { href: "/admin/testimonials", label: "Testimonials" },
+  { href: "/admin/faqs", label: "FAQs" },
+  { href: "/admin/stats", label: "Stats" },
+  { href: "/admin/pages", label: "Pages" },
   { href: "/admin/enquiries", label: "Enquiries" },
+  { href: "/admin/subscribers", label: "Subscribers" },
   { href: "/admin/settings", label: "Site settings" },
   { href: "/admin/products", label: "Products" },
 ];
